@@ -23,9 +23,9 @@
 
 ## 一、关于TDuck
 
-TDuck填鸭表单 是国内首批基于Vue开源的问卷/表单收集工具。
+TDuck 填鸭表单是国内较早基于 Vue 技术体系打造的开源企业级表单与数据采集平台，定位于企业数字化系统中的数据入口引擎。
 
-系统采用无代码设计理念，使用者可以通过拖拽的方式创建问卷表单，所见即所得；与此同时也支持专业技术人员自行二次开发自定义组件，来满足企不同企业组织的个性化需求。系统采用SpringBoot+Vue+ElementUI技术栈，无需复杂学习即可快速上手，功能强大UI界面清新，通过简要部署就能够助力企业组织快速赋能业务。
+系统融合无代码可视化设计与工程化扩展能力，既支持业务人员通过拖拽方式快速构建复杂表单，也支持技术团队进行组件级深度二次开发，满足政企私有化部署与系统集成交付需求。依托 SpringBoot + Vue 架构构建，具备稳定、可扩展、可持续演进的技术基础，可作为企业长期数字化建设中的核心模块之一。
 
 ### 功能特性
 
@@ -48,37 +48,44 @@ TDuck填鸭表单 是国内首批基于Vue开源的问卷/表单收集工具。
 
 ### 在线体验
 
-[TDuck-社区版🌳](https://demo.tduckapp.com) | [TDuckPro-vue2商业版🥈](https://pro.tduckcloud.com) |  [TDuckX-vue3商业版🥇](https://x.tduckcloud.com)  ｜ [官网](https://www.tduckcloud.com) 
+如需在线体验系统👉：[官网体验地址](https://www.tduckcloud.com) 
 
-表单系统有3个版本（社区、Pro、TDuckX），此处绕不清的友友可以看看 [填鸭表单产品能力对比](https://www.tduckcloud.com/doc/x/nSJMvQh6)
+表单系统有3个版本（社区、Pro、TDuckX），此处绕不清的伙伴可以看看 [填鸭表单产品能力对比](https://www.tduckcloud.com/doc/x/nSJMvQh6)
 
 所有版本的填鸭表单数据都可以通过WebHook集成至大屏端，实现数据同步：[表单与TReport数据同步教程](https://www.bilibili.com/video/BV1MH4y1K7Xa/)；
 
----
-
-### 二、社区活动
-社区版表单编辑器暂未开源，该模块通过npm引用，不影响使用、二开其他功能。
-
-可以通过给项目助力，获取社区版最新 **表单编辑器源码**！（限时）
-
-活动参与方式：[点击查看](https://doc.tduckcloud.com/openSource/activity.html)
-
-项目发展离不开您的助力，如有帮助请点亮star
-
-![登录](readmeImages/star.gif)
 
 ---
+在企业数字化建设中，表单不仅是工具，更是业务数据入口。
+选择不同形态的产品，意味着完全不同的控制权与成本结构。
 
-### 三、项目相关文档
-- [填鸭表单生态产品能力对比](https://www.tduckcloud.com/doc/x/nSJMvQh6)
-- <a href="https://doc.tduckcloud.com/openSource/deploy/deployforbt.html" target="_blank">使用宝塔一键安装</a>
+| 核心维度     | 传统 SaaS 表单 | TDuck 社区版        | **TDuckX/Pro 企业源码版** |
+| -------- | ---------- | ---------------- | ---------------- |
+| 数据归属     | 存储于第三方平台   | 企业自有服务器          | 企业自有服务器          |
+| 私有化部署    | 💰      | ✔️ 免费            | ✔️ 支持            |
+| 是否开源     | ❌          | ✔️ 后端开源          | ✔️ 完整源码授权        |
+| 源码交付     | ❌          | ✔️ 支持                | ✔️ 完整交付          |
+| 商业授权     | 按账号订阅      | MIT 开源           | ✔️ 商业授权协议        |
+| 二次开发能力   | 受限         | 可扩展              | ✔️ 深度二开          |
+| 项目交付能力   | 不适合定制项目    | 基础能力             | ✔️ 可作为交付系统       |
+| API 集成能力 | 部分开放       | 支持 API / WebHook | ✔️ 深度系统集成        |
+| 权限与组织体系  | 简化版        | 基础支持             | ✔️ 企业级 RBAC      |
+| 长期成本结构   | 持续订阅       | 自主控制             | 一次授权长期使用         |
+| 版本升级保障   | 平台控制       | 社区节奏             | ✔️ 企业持续升级支持      |
+| 法务合规风险   | 数据外部存储     | 自主可控             | ✔️ 可进入采购流程       |
+
+> 如果您正在评估将表单系统用于商业项目或私有化交付，建议重点关注源码授权与长期成本结构。
+
+---
+
+### 二、项目相关文档
+- [填鸭表单系列产品能力对比](https://www.tduckcloud.com/doc/x/nSJMvQh6)
+- <a href="https://doc.tduckcloud.com/openSource/deploy/deployforbt.html" target="_blank">宝塔一键安装（小白篇）</a>
 - [前端项目地址](https://gitee.com/TDuckApp/tduck-front)
-
-- [社区版体验地址](https://demo.tduckapp.com/home)
-- [小程序插件（社区版不适用）](https://doc.tduckcloud.com/functionDesc/uniappDesc.html)
+- [小程序插件](https://doc.tduckcloud.com/functionDesc/uniappDesc.html)
 ---
 
-### 四、项目部署
+### 三、项目部署
 > - 部署管理员账号：admin@tduckcloud.com
 > - 部署默认密码：123456
 
@@ -91,7 +98,7 @@ TDuck填鸭表单 是国内首批基于Vue开源的问卷/表单收集工具。
 
 ---
 
-#### 方式二：使用docker命令快速启动
+#### 方式二：使用Docker快速启动
 
 
 ```bash
@@ -126,7 +133,7 @@ docker run -d \
 
 ---
 
-#### 方式三：使用docker-compose 部署环境及项目
+#### 方式三：使用Docker-compose 部署环境及项目
 ```shell
 1.先安装docker-compose
 2.下载tduck源码
@@ -137,7 +144,7 @@ docker run -d \
 
 #### 方式四：使用宝塔部署项目
 - 部署文档：https://doc.tduckcloud.com/openSource/deploy/openSourceDeploy.html
-- 使用指定配置文件：https://doc.tduckcloud.com/openSource/deploy/startByProfile.html
+- 使用指定配置文件启动：https://doc.tduckcloud.com/openSource/deploy/startByProfile.html
 
 ---
 
@@ -146,9 +153,21 @@ docker run -d \
 - 常见问题：https://doc.tduckcloud.com/openSource/deploy/usualQuestion.html
 ---
 
-### 五、关于问题咨询
+### 四、关于问题咨询
 - 如果您在使用社区版过程中遇到了问题，可在社区查看常见问题或留言进行求助 - [点击进入填鸭问答社区](https://gitee.com/TDuckApp/tduck-platform/issues)
 ------------------------------
+
+
+### 五、社区活动
+社区版后端100%开源，前端项目表单编辑器暂未开源，该模块通过npm引用，不影响使用、二开其他功能。
+
+如有需要，您可以通过给项目助力获取社区版最新 **表单编辑器源码**！（限时）
+
+活动参与方式：[点击查看](https://doc.tduckcloud.com/openSource/activity.html)
+
+项目发展离不开您的助力，如有帮助请点亮star
+
+![登录](readmeImages/star.gif)
 
 ### 六、预览-社区版 - Preview
 
