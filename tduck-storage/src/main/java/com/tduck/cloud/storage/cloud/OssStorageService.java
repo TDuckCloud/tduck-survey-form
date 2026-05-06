@@ -1,6 +1,8 @@
 package com.tduck.cloud.storage.cloud;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpUtil;
+import com.tduck.cloud.storage.exception.StorageException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -58,4 +60,17 @@ public abstract class OssStorageService {
      * @param path 相对于存储系统的路径
      */
     public abstract void delete(String path);
+
+
+    /**
+     * 校验文件后缀
+     *
+     * @param path
+     */
+    protected void checkExtension(String path) {
+        String ext = FileUtil.extName(path);
+        if ("jsp".equalsIgnoreCase(ext) || "html".equalsIgnoreCase(ext)) {
+            throw new StorageException("不支持上传该类型文件");
+        }
+    }
 }

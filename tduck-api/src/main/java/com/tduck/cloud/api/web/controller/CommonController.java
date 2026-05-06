@@ -7,6 +7,7 @@ import com.tduck.cloud.api.annotation.NotLogin;
 import com.tduck.cloud.common.util.AsyncProcessUtils;
 import com.tduck.cloud.common.util.Result;
 import com.tduck.cloud.storage.cloud.OssStorageFactory;
+import com.tduck.cloud.storage.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,9 +43,10 @@ public class CommonController {
     @NotLogin
     public Result avatar(@RequestParam("file") MultipartFile file) throws IOException {
         if (!file.isEmpty()) {
-            String path = new StringBuffer(IdUtil.simpleUUID())
-                    .append(CharUtil.DOT)
-                    .append(FileUtil.extName(file.getOriginalFilename())).toString();
+            OssStorageFactory.checkAllowedExtension(file, MimeTypeUtils.MimeTypeEnum.DEFAULT.getExtensions());
+            String path = IdUtil.simpleUUID() +
+                    CharUtil.DOT +
+                    FileUtil.extName(file.getOriginalFilename());
             String url = OssStorageFactory.getStorageService().upload(file.getInputStream(), path);
             return Result.success(url);
         }
