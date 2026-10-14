@@ -162,6 +162,13 @@ public class UserController {
         if (!request.getPassword().equals(request.getRepeatPassword())) {
             return Result.failed("两次密码不一致");
         }
+        if (request.getPassword().equals(request.getOldPassword())) {
+            return Result.failed("新密码不能与原密码相同");
+        }
+        String strengthError = PasswordUtils.validatePasswordStrength(request.getPassword());
+        if (strengthError != null) {
+            return Result.failed(strengthError);
+        }
         userService.updatePassword(userEntity.getId(), request.getPassword());
         return Result.success();
     }

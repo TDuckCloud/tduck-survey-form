@@ -19,7 +19,7 @@ public class MimeTypeUtils {
 
     public static final String IMAGE_GIF = "image/gif";
 
-    public static final String[] IMAGE_EXTENSION = {"bmp", "gif", "jpg", "jpeg", "png", "tiff", "webp", "tif", "svg"};
+    public static final String[] IMAGE_EXTENSION = {"bmp", "gif", "jpg", "jpeg", "png", "tiff", "webp", "tif"};
 
     public static final String[] FLASH_EXTENSION = {"swf", "flv"};
 
@@ -28,7 +28,7 @@ public class MimeTypeUtils {
     public static final String[] VIDEO_EXTENSION = {"mp4", "avi", "rmvb", "webm", "ogg", "mpg", "mpeg", "mov", "wmv", "flv", "mkv"};
     public static final String[] DEFAULT_ALLOWED_EXTENSION = {
             // 图片
-            "bmp", "gif", "jpg", "jpeg", "png", "tiff", "webp", "tif", "svg",
+            "bmp", "gif", "jpg", "jpeg", "png", "tiff", "webp", "tif",
             // word excel powerpoint
             "doc", "docx", "xls", "xlsx", "csv", "ppt", "pptx", "txt", "odp",
             // 压缩文件

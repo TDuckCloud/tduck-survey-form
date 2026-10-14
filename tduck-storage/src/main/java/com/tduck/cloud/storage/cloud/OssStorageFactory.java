@@ -110,4 +110,26 @@ public final class OssStorageFactory {
         }
     }
 
+    /**
+     * 判断附件 URL 是否属于本平台合法的存储域
+     *
+     * @param fileUrl 文件地址
+     * @return 是否属于本系统合法存储域
+     */
+    public static boolean isAllowedStorageUrl(String fileUrl) {
+        OssStorageService service = getStorageService();
+        return service != null && service.isAllowedStorageUrl(fileUrl);
+    }
+
+    /**
+     * 安全下载存储附件字节
+     *
+     * @param fileUrl 文件地址
+     * @return 文件字节
+     */
+    public static byte[] downloadBytes(String fileUrl) {
+        OssStorageService service = getStorageService();
+        return service != null ? service.downloadBytes(fileUrl) : null;
+    }
+
 }

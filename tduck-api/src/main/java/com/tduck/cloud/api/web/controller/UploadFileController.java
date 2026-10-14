@@ -7,6 +7,8 @@ import cn.hutool.crypto.SecureUtil;
 import com.tduck.cloud.common.util.Result;
 import com.tduck.cloud.storage.cloud.OssStorageFactory;
 import com.tduck.cloud.storage.util.MimeTypeUtils;
+import com.tduck.cloud.form.entity.UserFormEntity;
+import com.tduck.cloud.form.service.UserFormService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +26,8 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 public class UploadFileController {
+
+    private final UserFormService userFormService;
 
 
     /**
@@ -64,6 +68,10 @@ public class UploadFileController {
     public Result<String> uploadFormFile(@RequestParam("file") MultipartFile file,
                                          @RequestParam(value = "fileType", required = false, defaultValue = "DEFAULT") String fileType,
                                          @PathVariable("formKey") String formKey) throws IOException {
+        UserFormEntity form = userFormService.getByKey(formKey);
+        if (form == null) {
+            return Result.failed("表单不存在或已下线");
+        }
         String path = SecureUtil.md5(formKey) +
                 CharUtil.SLASH +
                 IdUtil.simpleUUID() +

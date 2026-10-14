@@ -72,6 +72,11 @@ public class UserEntity extends BaseEntity<UserEntity> {
      */
     private Integer passwordType;
 
+    /**
+     * 是否需要修改密码 0否 1是
+     */
+    private Boolean needChangePassword;
+
 
     public Boolean isAdmin() {
         return SecurityUtils.isAdmin(this.id);

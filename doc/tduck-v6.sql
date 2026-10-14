@@ -36,16 +36,17 @@ CREATE TABLE `ac_user`
     `last_login_time`    datetime                                                               DEFAULT NULL COMMENT '最后登录时间',
     `last_login_ip`      varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci           DEFAULT NULL COMMENT '最后登录Ip',
     `password_type`      tinyint(1) DEFAULT '0' COMMENT '密码类型',
+    `need_change_password` tinyint(1) DEFAULT '0' COMMENT '是否需要修改密码 0否 1是',
     `deleted`            tinyint(1) DEFAULT '0' COMMENT '状态',
     `create_time`        datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time`        datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=15672 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='用户';
 INSERT INTO ac_user (`id`, `name`, `avatar`, `gender`, `email`, `phone_number`, `password`, `reg_channel`,
-                     `last_login_channel`, `last_login_time`, `last_login_ip`, `password_type`, `deleted`,
+                     `last_login_channel`, `last_login_time`, `last_login_ip`, `password_type`, `need_change_password`, `deleted`,
                      `create_time`, `update_time`)
 VALUES (1, 'admin', '', 1, 'admin@tduckcloud.com', NULL, '$2a$10$FgOTdkh3qVLE9DNgD4XzDu2PCJB3QtnGbriBPaMhMKTVWM9XYsiIm',
-        '1', 2, '2023-04-06 09:35:22', '172.17.0.1', 1, 0, '2021-06-13 13:49:25', '2023-04-06 09:35:22');
+        '1', 2, '2023-04-06 09:35:22', '172.17.0.1', 1, 1, 0, '2021-06-13 13:49:25', '2023-04-06 09:35:22');
 
 -- ----------------------------
 -- Table structure for ac_user_authorize

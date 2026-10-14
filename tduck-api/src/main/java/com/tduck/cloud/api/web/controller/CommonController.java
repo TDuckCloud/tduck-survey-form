@@ -40,7 +40,6 @@ public class CommonController {
      * @throws IOException
      */
     @PostMapping("/upload")
-    @NotLogin
     public Result avatar(@RequestParam("file") MultipartFile file) throws IOException {
         if (!file.isEmpty()) {
             OssStorageFactory.checkAllowedExtension(file, MimeTypeUtils.MimeTypeEnum.DEFAULT.getExtensions());

@@ -1,5 +1,7 @@
 package com.tduck.cloud.account.service.impl;
 
+import cn.hutool.cache.CacheUtil;
+import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReUtil;
@@ -91,8 +93,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
 
+    /**
+     * 登录失败计数缓存（15分钟自动过期，防暴力破解）
+     */
+    private static final TimedCache<String, Integer> LOGIN_FAIL_CACHE = CacheUtil.newTimedCache(15 * 60 * 1000);
+
+    static {
+        LOGIN_FAIL_CACHE.schedulePrune(5 * 60 * 1000);
+    }
+
     @Override
     public Result accountLogin(AccountLoginRequest request) {
+        String failKey = "login:fail:" + request.getAccount();
+        Integer failCount = LOGIN_FAIL_CACHE.get(failKey);
+        if (failCount != null && failCount >= 5) {
+            return Result.failed("密码错误次数过多，账号已临时锁定15分钟");
+        }
+
         UserEntity userEntity;
         if (ReUtil.isMatch(Validator.EMAIL, request.getAccount())) {
             userEntity = getUserByEmail(request.getAccount());
@@ -100,8 +117,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userEntity = getUserByPhoneNumber(request.getAccount());
         }
         if (ObjectUtil.isNull(userEntity) || !PasswordUtils.checkPassword(userEntity, request.getPassword())) {
+            int currentFail = (failCount == null ? 0 : failCount) + 1;
+            LOGIN_FAIL_CACHE.put(failKey, currentFail);
             return Result.failed("账号或密码错误");
         }
+        LOGIN_FAIL_CACHE.remove(failKey);
         updatePasswordType(userEntity, request.getPassword());
         return Result.success(getLoginResult(userEntity,
                 ReUtil.isMatch(Validator.EMAIL, request.getAccount()) ? AccountChannelEnum.EMAIL : AccountChannelEnum.PHONE,
@@ -134,7 +154,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         String token = jwtUtils.generateToken(userEntity.getId());
         // 缓存token
         userTokenService.saveToken(token, userEntity.getId(), LocalDateTime.now().plusSeconds(jwtUtils.getExpire()));
-        return new LoginUserVO(userEntity.getAvatar(), userEntity.getName(), token, userEntity.isAdmin());
+        LoginUserVO loginUserVO = new LoginUserVO(userEntity.getAvatar(), userEntity.getName(), token, userEntity.isAdmin());
+        loginUserVO.setNeedChangePassword(Boolean.TRUE.equals(userEntity.getNeedChangePassword()));
+        return loginUserVO;
     }
 
     @Override
@@ -172,6 +194,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity userEntity = new UserEntity();
         userEntity.setId(userId);
         userEntity.setPassword(PasswordUtils.encode(password));
+        userEntity.setNeedChangePassword(false);
         return this.updateById(userEntity);
     }
 }

@@ -28,4 +28,16 @@ public class LoginUserVO {
     private String token;
 
     private boolean isAdmin;
+
+    /**
+     * 是否需要修改密码
+     */
+    private Boolean needChangePassword;
+
+    public LoginUserVO(String avatar, String name, String token, boolean isAdmin) {
+        this.avatar = avatar;
+        this.name = name;
+        this.token = token;
+        this.isAdmin = isAdmin;
+    }
 }

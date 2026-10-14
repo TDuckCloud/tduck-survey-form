@@ -13,7 +13,6 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
-import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
@@ -103,6 +102,26 @@ public class UserFormDataServiceImpl extends ServiceImpl<UserFormDataMapper, Use
         if (CollectionUtil.isEmpty(rows) || CollectionUtil.isEmpty(userFormItemEntityList)) {
             return Result.failed("暂无收集附件，无法下载");
         }
+
+        // 预检：选中的数据中是否存在已填写的有效附件
+        boolean hasFiles = rows.stream().anyMatch(result ->
+                userFormItemEntityList.stream().anyMatch(item -> {
+                    Object val = MapUtil.get(result, item.getFormItemId(), Object.class);
+                    if (val == null) {
+                        return false;
+                    }
+                    try {
+                        List<UploadResultStruct> uploadResults = JsonUtils.jsonToList(JsonUtils.objToJson(val), UploadResultStruct.class);
+                        return CollectionUtil.isNotEmpty(uploadResults) && uploadResults.stream().anyMatch(u -> StrUtil.isNotBlank(u.getUrl()));
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+        );
+        if (!hasFiles) {
+            return Result.failed("选中的数据中未包含任何附件，无法下载");
+        }
+
         List<Map> finalRows = rows;
         ThreadUtil.execAsync(() -> {
             TimeInterval timer = DateUtil.timer();
@@ -115,16 +134,32 @@ public class UserFormDataServiceImpl extends ServiceImpl<UserFormDataMapper, Use
                         List<UploadResultStruct> uploadResults = JsonUtils.jsonToList(JsonUtils.objToJson(MapUtil.get(result, item.getFormItemId(), List.class)), UploadResultStruct.class);
                         if (CollectionUtil.isNotEmpty(uploadResults)) {
                             uploadResults.forEach(uFile -> {
-                                if (StrUtil.isNotBlank(uFile.getUrl())) {
-                                    paths.add(FileNameUtil.getName(uFile.getUrl()));
-                                    byte[] bytes = HttpUtil.downloadBytes(uFile.getUrl());
-                                    ins.add(IoUtil.toStream(bytes));
+                                String fileUrl = uFile.getUrl();
+                                if (StrUtil.isNotBlank(fileUrl)) {
+                                    // 1. 校验是否属于本系统存储域名/路径
+                                    if (!OssStorageFactory.isAllowedStorageUrl(fileUrl)) {
+                                        log.warn("检测到非本系统存储附件 URL，跳过下载: {}", fileUrl);
+                                        return;
+                                    }
+                                    // 2. 安全读取/下载存储附件（本地存储优先读磁盘，远程存储走安全 HTTP）
+                                    byte[] bytes = OssStorageFactory.downloadBytes(fileUrl);
+                                    if (bytes != null && bytes.length > 0) {
+                                        paths.add(FileNameUtil.getName(fileUrl));
+                                        ins.add(IoUtil.toStream(bytes));
+                                    }
                                 }
                             });
                         }
                     });
                     AsyncProcessUtils.setProcess(uuid, ++index / finalRows.size());
                 });
+
+                if (CollectionUtil.isEmpty(paths) || CollectionUtil.isEmpty(ins)) {
+                    log.warn("未获取到有效的附件文件内容，跳过压缩打包: uuid={}", uuid);
+                    AsyncProcessUtils.setProcess(uuid, "EMPTY_FILES");
+                    return;
+                }
+
                 // 压缩上传oss
                 ByteArrayOutputStream zipOutputStream = new ByteArrayOutputStream();
                 ZipUtil.zip(zipOutputStream, paths.toArray(new String[]{}), ins.toArray(new InputStream[]{}));
@@ -132,7 +167,8 @@ public class UserFormDataServiceImpl extends ServiceImpl<UserFormDataMapper, Use
                 AsyncProcessUtils.setProcess(uuid, downloadUrl);
                 log.info("export file cost time: {}", timer.interval());
             } catch (Exception e) {
-                log.error("download file", e);
+                log.error("download file error", e);
+                AsyncProcessUtils.setProcess(uuid, "ERROR");
             }
         });
         return Result.success(uuid);

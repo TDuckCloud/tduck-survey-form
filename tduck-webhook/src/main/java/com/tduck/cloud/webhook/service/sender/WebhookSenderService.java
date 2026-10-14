@@ -7,6 +7,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpStatus;
 import cn.hutool.http.HttpUtil;
 import com.tduck.cloud.common.util.JsonUtils;
+import com.tduck.cloud.common.util.SsrfValidator;
 import com.tduck.cloud.webhook.constant.WebhookEventConstants;
 import com.tduck.cloud.webhook.entity.WebhookConfigEntity;
 import com.tduck.cloud.webhook.entity.WebhookEventEntity;
@@ -81,13 +82,19 @@ public class WebhookSenderService {
      * @return boolean 是否成功
      */
     public boolean sendHttp(WebhookConfigEntity webhookConfig, WebhookEventEntity webhookEvent) {
-        HttpRequest request = null;
         String url = webhookConfig.getUrl();
+        // SSRF 防御二次校验
+        SsrfValidator.validateUrl(url);
+
+        HttpRequest request = null;
         if (webhookConfig.getRequestType().equals(WebhookConfigEntity.RequestTypeEnum.GET.toString())) {
             request = HttpUtil.createGet(url);
         } else {
             request = HttpUtil.createPost(url);
         }
+        request.timeout(3000);
+        request.setFollowRedirects(false);
+
         Map<String, Object> eventData = JsonUtils.jsonToMap(webhookEvent.getEventData());
         if (eventData == null) {
             eventData = MapUtil.newHashMap();
