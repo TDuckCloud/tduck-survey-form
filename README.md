@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://doc-oss.tduckcloud.com/doc/favicon-blue.png" width="100" alt="TDuck Logo" />
+    <img src="https://pro-oss.tduckcloud.com/6d4fa9c6ee554cd193161c4e658cb5e6.png" width="100" alt="TDuck Logo" />
 </p>
 
 <p align="center">
