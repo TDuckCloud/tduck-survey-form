@@ -95,6 +95,12 @@ public class UserFormDataEntity extends SysBaseEntity {
      */
     private String extValue;
 
+    /**
+     * 填写密码（非数据库持久化字段，用于提交校验）
+     */
+    @TableField(exist = false)
+    private String writePassword;
+
 
 
 }

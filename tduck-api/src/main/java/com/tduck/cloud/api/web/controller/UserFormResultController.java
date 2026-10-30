@@ -7,11 +7,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.tduck.cloud.api.util.HttpUtils;
 import com.tduck.cloud.common.constant.CommonConstants;
+import com.tduck.cloud.common.constant.ResponseCodeConstants;
 import com.tduck.cloud.common.email.MailService;
 import com.tduck.cloud.common.util.CacheUtils;
 import com.tduck.cloud.common.util.Result;
 import com.tduck.cloud.common.util.SecurityUtils;
 import com.tduck.cloud.common.validator.ValidatorUtils;
+import com.tduck.cloud.form.constant.FormSettingConstants;
 import com.tduck.cloud.form.entity.UserFormDataEntity;
 import com.tduck.cloud.form.entity.UserFormEntity;
 import com.tduck.cloud.form.entity.UserFormViewCountEntity;
@@ -154,6 +156,12 @@ public class UserFormResultController {
     public Result<Map<String, Object>> createPublicFormResult(@RequestBody UserFormDataEntity entity, HttpServletRequest request) {
         ValidatorUtils.validateEntity(entity);
         entity.setSubmitRequestIp(HttpUtils.getIpAddr(request));
+        // 校验表单填写密码
+        String writePassword = StrUtil.isNotBlank(entity.getWritePassword()) ? entity.getWritePassword() : request.getHeader(FormSettingConstants.HEADER_FORM_WRITE_PWD);
+        Result<Boolean> pwdCheckResult = userFormSettingService.checkFormWritePwd(entity.getFormKey(), writePassword);
+        if (ObjectUtil.isNotNull(pwdCheckResult) && (pwdCheckResult.getCode() != ResponseCodeConstants.SUCCESS || StrUtil.isNotBlank(pwdCheckResult.getMsg()))) {
+            return Result.failed(pwdCheckResult.getMsg());
+        }
         Result<Boolean> userFormSettingStatus = userFormSettingService.getUserFormWriteSettingStatus(entity.getFormKey(), entity.getSubmitRequestIp(), entity.getWxOpenId(), CommonConstants.ConstantNumber.ONE);
         if (StrUtil.isNotBlank(userFormSettingStatus.getMsg())) {
             return Result.failed(userFormSettingStatus.getMsg());

@@ -17,5 +17,18 @@ public interface FormSettingConstants {
      */
     String SUBMIT_SHOW_CUSTOM_PAGE_KEY = "submitShowCustomPage";
 
+    /**
+     * 密码输入错误提示
+     */
+    String PWD_INPUT_ERROR_MSG = "密码输入错误";
 
+    /**
+     * 密码保护提示
+     */
+    String PWD_PROTECTED_MSG = "表单已开启密码保护，请输入密码";
+
+    /**
+     * 表单填写密码请求头
+     */
+    String HEADER_FORM_WRITE_PWD = "Form-Write-Pwd";
 }

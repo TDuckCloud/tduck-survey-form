@@ -50,6 +50,16 @@ public interface UserFormSettingService extends IService<UserFormSettingEntity> 
 
 
     /**
+     * 校验表单填写密码
+     *
+     * @param formKey       表单key
+     * @param writePassword 用户输入的填写密码
+     * @return 校验结果
+     */
+    Result<Boolean> checkFormWritePwd(String formKey, String writePassword);
+
+
+    /**
      * 删除表单所有设置
      *
      * @param key 表单key

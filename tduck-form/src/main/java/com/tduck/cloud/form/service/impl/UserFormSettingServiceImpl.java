@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tduck.cloud.common.constant.CommonConstants;
 import com.tduck.cloud.common.util.Result;
 import com.tduck.cloud.common.util.SecurityUtils;
+import com.tduck.cloud.form.constant.FormSettingConstants;
 import com.tduck.cloud.form.entity.UserFormDataEntity;
 import com.tduck.cloud.form.entity.UserFormEntity;
 import com.tduck.cloud.form.entity.UserFormSettingEntity;
@@ -189,6 +190,27 @@ public class UserFormSettingServiceImpl extends ServiceImpl<UserFormSettingMappe
     public Boolean deleteAllSetting(String formKey) {
         this.remove(Wrappers.<UserFormSettingEntity>lambdaQuery().eq(UserFormSettingEntity::getFormKey, formKey));
         return true;
+    }
+
+    @Override
+    public Result<Boolean> checkFormWritePwd(String formKey, String writePassword) {
+        FormSettingSchemaStruct formSettingSchema = getFormSettingSchema(formKey);
+        // 如果未配置设置或未开启密码填写，则无需密码，直接通过
+        if (ObjectUtil.isNull(formSettingSchema) || !formSettingSchema.isPasswordWriteStatus()) {
+            return Result.success(true);
+        }
+        // 若开启了密码填写但未设置密码，也视为无需密码校验
+        if (StrUtil.isBlank(formSettingSchema.getWritePassword())) {
+            return Result.success(true);
+        }
+        // 开启了密码保护，校验客户端提供的密码
+        if (StrUtil.isBlank(writePassword)) {
+            return Result.failed(FormSettingConstants.PWD_PROTECTED_MSG);
+        }
+        if (formSettingSchema.getWritePassword().equals(writePassword)) {
+            return Result.success(true);
+        }
+        return Result.failed(FormSettingConstants.PWD_INPUT_ERROR_MSG);
     }
 
 }

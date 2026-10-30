@@ -154,11 +154,7 @@ public class UserFormSettingController {
     @PostMapping("/user/form/public/checkWritePwd")
     @PermitAll
     public Result<Boolean> checkWritePwd(@RequestBody @Validated CheckWritePwdRequest request) {
-        FormSettingSchemaStruct formSettingSchema = userFormSettingService.getFormSettingSchema(request.getFormKey());
-        if (formSettingSchema.getWritePassword().equals(request.getPassword())) {
-            return Result.success(true);
-        }
-        return Result.failed("密码输入错误");
+        return userFormSettingService.checkFormWritePwd(request.getFormKey(), request.getPassword());
     }
 
 
