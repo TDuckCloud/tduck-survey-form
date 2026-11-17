@@ -71,12 +71,7 @@ public class FormTemplateController {
      */
     @GetMapping("/form/template/page")
     public Result queryFormTemplates(QueryFormTemplateRequest.Page request) {
-        return Result.success(
-                formTemplateService.page(request.toMybatisPage(),
-                        Wrappers.<FormTemplateEntity>lambdaQuery()
-                                .eq(ObjectUtil.isNotNull(request.getType()), FormTemplateEntity::getCategoryId, request.getType())
-                                .like(StrUtil.isNotBlank(request.getName()), FormTemplateEntity::getName, request.getName())
-                                .orderByDesc(FormTemplateEntity::getCreateTime)));
+        return Result.success(formTemplateService.queryPage(request));
     }
 
 

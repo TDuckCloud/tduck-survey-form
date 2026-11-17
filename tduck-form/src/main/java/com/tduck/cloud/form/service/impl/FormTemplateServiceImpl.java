@@ -3,13 +3,17 @@ package com.tduck.cloud.form.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tduck.cloud.form.entity.*;
 import com.tduck.cloud.form.entity.enums.FormSourceTypeEnum;
 import com.tduck.cloud.form.entity.enums.FormStatusEnum;
 import com.tduck.cloud.form.entity.enums.FormTypeEnum;
 import com.tduck.cloud.form.mapper.FormTemplateMapper;
+import com.tduck.cloud.form.request.QueryFormTemplateRequest;
 import com.tduck.cloud.form.service.*;
 import com.tduck.cloud.form.util.ShortIdUtils;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,15 @@ public class FormTemplateServiceImpl extends ServiceImpl<FormTemplateMapper, For
     private final UserFormService userFormService;
     private final UserFormThemeService userFormThemeService;
     private final UserFormLogicService userFormLogicService;
+
+    @Override
+    public Page<FormTemplateEntity> queryPage(QueryFormTemplateRequest.Page request) {
+        QueryWrapper<FormTemplateEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq(ObjectUtil.isNotNull(request.getType()), "t.category_id", request.getType())
+                .like(StrUtil.isNotBlank(request.getName()), "t.name", request.getName())
+                .orderByDesc("t.create_time");
+        return this.baseMapper.selectPageWithCategory(request.toMybatisPage(), wrapper);
+    }
 
     @Override
     public FormTemplateEntity getByKey(String key) {

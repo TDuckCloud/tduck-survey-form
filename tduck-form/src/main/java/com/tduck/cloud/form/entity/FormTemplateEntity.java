@@ -48,6 +48,13 @@ public class FormTemplateEntity extends BaseEntity<FormTemplateEntity> {
      */
     @NotNull(message = "表单类型不能为空", groups = {AddGroup.class, UpdateGroup.class})
     private Long categoryId;
+
+    /**
+     * 分类名称
+     */
+    @TableField(exist = false)
+    private String categoryName;
+
     /**
      * 状态
      */
