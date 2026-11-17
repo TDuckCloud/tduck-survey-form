@@ -55,6 +55,12 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         if (StrUtil.isBlank(token)) {
             token = request.getParameter(jwtUtils.getHeader());
         }
+        if (StrUtil.isBlank(token)) {
+            String authHeader = request.getHeader("Authorization");
+            if (StrUtil.isNotBlank(authHeader)) {
+                token = StrUtil.removePrefixIgnoreCase(authHeader, "Bearer ").trim();
+            }
+        }
         // 凭证为空
         if (StrUtil.isBlank(token) && !noLogin) {
             throw new AuthorizationException(jwtUtils.getHeader() + "不能为空");

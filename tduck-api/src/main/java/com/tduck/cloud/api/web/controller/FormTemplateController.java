@@ -88,7 +88,7 @@ public class FormTemplateController {
      */
     @PostMapping("/form/template/create")
     public Result createFormTemplate(@RequestBody FormTemplateEntity formTemplateEntity, @RequestAttribute Long userId) {
-        Assert.isTrue(SecurityUtils.isAdmin(), "无权限访问");
+        Assert.isTrue(SecurityUtils.isAdmin(), "仅超级管理员可以保存公开模板，普通用户只能保存个人模板");
         FormTemplateEntity formTemplate = formTemplateService.createFormTemplate(formTemplateEntity);
         return Result.success(formTemplate.getFormKey());
     }
