@@ -192,6 +192,11 @@ public class UserFormDataServiceImpl extends ServiceImpl<UserFormDataMapper, Use
     @Override
     public Boolean updateFormResult(UserFormDataEntity entity) {
         UserFormDataEntity dataEntity = this.getById(entity.getId());
+        if (ObjectUtil.isNull(dataEntity)) {
+            return false;
+        }
+        // 权限校验
+        FormAuthUtils.hasPermission(dataEntity.getFormKey());
         dataEntity.setOriginalData(entity.getOriginalData());
         dataEntity.setUpdateBy(entity.getUpdateBy());
         boolean update = this.updateById(dataEntity);
