@@ -16,7 +16,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <mybatis.plus.version>3.5.3</mybatis.plus.version>
-        <guava.version>30.1.1-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <commons.lang3.vesrion>3.12.0</commons.lang3.vesrion>
         <commons.io.version>2.9.0</commons.io.version>
         <commons.configuration.version>1.10</commons.configuration.version>
