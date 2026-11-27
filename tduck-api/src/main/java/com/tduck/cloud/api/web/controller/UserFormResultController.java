@@ -205,10 +205,8 @@ public class UserFormResultController {
     @PostMapping("/update")
     public Result<Void> updateFormResult(@RequestBody UserFormDataEntity entity, HttpServletRequest request) {
         ValidatorUtils.validateEntity(entity);
-        try {
-            entity.setUpdateBy(String.valueOf(SecurityUtils.getUserId()));
-        } catch (Exception ignored) {
-        }
+        FormAuthUtils.hasPermission(entity.getFormKey());
+        entity.setUpdateBy(String.valueOf(SecurityUtils.getUserId()));
         formResultService.updateFormResult(entity);
         return Result.success();
     }

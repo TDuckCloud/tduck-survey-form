@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
 import com.tduck.cloud.common.constant.CommonConstants;
+import com.tduck.cloud.common.exception.BaseException;
 import com.tduck.cloud.common.util.*;
 import com.tduck.cloud.form.entity.UserFormDataEntity;
 import com.tduck.cloud.form.entity.UserFormItemEntity;
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.tduck.cloud.form.constant.FormRedisKeyConstants.FORM_RESULT_NUMBER;
 import static com.tduck.cloud.webhook.constant.WebhookEventConstants.WEBHOOK_EVENT_TYPE_FORM_DATA_ADD;
@@ -183,21 +185,56 @@ public class UserFormDataServiceImpl extends ServiceImpl<UserFormDataMapper, Use
 
     @Override
     public Boolean deleteByIds(List<String> dataIdList, String formKey) {
-        baseMapper.deleteBatchIds(dataIdList);
-        formDataUtils.asyncDeleteEsDocument(dataIdList, formKey);
-        FormWebHookUtils.pushFormDataDeleteWebHook(dataIdList, formKey);
+        // 校验表单归属权限
+        FormAuthUtils.hasPermission(formKey);
+        if (CollUtil.isEmpty(dataIdList)) {
+            return true;
+        }
+        // 仅筛选归属于当前表单的数据 ID
+        List<UserFormDataEntity> ownedDataList = this.list(
+                Wrappers.<UserFormDataEntity>lambdaQuery()
+                        .select(UserFormDataEntity::getId)
+                        .eq(UserFormDataEntity::getFormKey, formKey)
+                        .in(UserFormDataEntity::getId, dataIdList)
+        );
+        if (CollUtil.isEmpty(ownedDataList)) {
+            return true;
+        }
+        List<String> validIdList = ownedDataList.stream()
+                .map(item -> String.valueOf(item.getId()))
+                .collect(Collectors.toList());
+        this.remove(
+                Wrappers.<UserFormDataEntity>lambdaQuery()
+                        .eq(UserFormDataEntity::getFormKey, formKey)
+                        .in(UserFormDataEntity::getId, validIdList)
+        );
+        formDataUtils.asyncDeleteEsDocument(validIdList, formKey);
+        FormWebHookUtils.pushFormDataDeleteWebHook(validIdList, formKey);
         return true;
     }
 
     @Override
     public Boolean updateFormResult(UserFormDataEntity entity) {
+        if (ObjectUtil.isNull(entity) || ObjectUtil.isNull(entity.getId())) {
+            throw new BaseException(FormAuthUtils.NO_FORM_PERMISSION_MSG);
+        }
         UserFormDataEntity dataEntity = this.getById(entity.getId());
+        if (ObjectUtil.isNull(dataEntity)) {
+            throw new BaseException(FormAuthUtils.NO_FORM_PERMISSION_MSG);
+        }
+        // 基于数据库记录的 formKey 校验归属权限
+        FormAuthUtils.hasPermission(dataEntity.getFormKey());
+        // 校验请求参数中的 formKey 与数据库记录一致
+        if (StrUtil.isNotBlank(entity.getFormKey())
+                && !StrUtil.equals(dataEntity.getFormKey(), entity.getFormKey())) {
+            throw new BaseException(FormAuthUtils.NO_FORM_PERMISSION_MSG);
+        }
         dataEntity.setOriginalData(entity.getOriginalData());
         dataEntity.setUpdateBy(entity.getUpdateBy());
         boolean update = this.updateById(dataEntity);
         // 查询数据 同步到es 避免数据变空被覆盖
         formDataUtils.asyncUpdateEsDocument(dataEntity);
-        FormWebHookUtils.pushFormDataSaveWebHook(entity, WEBHOOK_EVENT_TYPE_FORM_DATA_UPDATE);
+        FormWebHookUtils.pushFormDataSaveWebHook(dataEntity, WEBHOOK_EVENT_TYPE_FORM_DATA_UPDATE);
         return update;
     }
 
@@ -206,7 +243,7 @@ public class UserFormDataServiceImpl extends ServiceImpl<UserFormDataMapper, Use
         Map<String, Object> result = Maps.newHashMap();
         UserFormDataEntity dataEntity = this.getById(dataId);
         if (ObjectUtil.isNull(dataEntity)) {
-            return Result.failed("数据不存在");
+            throw new BaseException(FormAuthUtils.NO_FORM_PERMISSION_MSG);
         }
         // 权限校验
         FormAuthUtils.hasPermission(dataEntity.getFormKey());
